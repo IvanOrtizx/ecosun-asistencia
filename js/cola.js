@@ -23,7 +23,8 @@ self.Cola = (function () {
             res.resultados.push(r.marca);
             return DB.poner('marcas', Object.assign({ local_id: item.id, t_dispositivo: item.m.t_dispositivo }, r.marca)).then(function () { return DB.quitar('cola', item.id); }).then(siguiente);
           }, function (e) {
-            if (e.red) { res.quedan = lista.length - i + 1; res.error = 'red'; return res; }
+            // Sin señal, servidor ocupado o falla momentánea: la marca se queda en el celular y se reintenta
+            if (e.red || e.codigo === 'ocupado' || e.codigo === 'interno') { res.quedan = lista.length - i + 1; res.error = 'red'; return res; }
             if (e.codigo === 'sesion') { res.quedan = lista.length - i + 1; res.error = 'sesion'; return res; }
             // Error de validación: se guarda aparte para no bloquear la cola
             item.intentos++; item.error = e.message;
