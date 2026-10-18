@@ -421,7 +421,7 @@
     P().innerHTML = '<div class="cab"><div><h1>Nómina</h1><p>Excel del mes con horas, tardanzas y horas extra aprobadas.</p></div></div>' +
       '<div class="card" style="max-width:560px"><div class="campo"><label for="nm-mes">Mes</label><select class="inp" id="nm-mes">' + meses.map(function (m) { return '<option value="' + m + '">' + MESES[+m.slice(5) - 1].replace(/^./, function (c) { return c.toUpperCase(); }) + ' ' + m.slice(0, 4) + '</option>'; }).join('') + '</select></div>' +
       '<button class="btn prim bloque" id="nm-ok">' + ICON.descarga + ' Descargar Excel</button>' +
-      '<p class="small muted" style="margin:14px 0 0">Trae tres hojas: resumen por persona, detalle de horas extra y asistencia diaria. Recargos según Ajustes (extra diurna 25 %, nocturna 75 %, dominical o festivo 90 %). Antes de liquidar, revisa que no queden horas extra por aprobar.</p></div>';
+      '<p class="small muted" style="margin:14px 0 0">La primera hoja, <b>Novedades nómina</b>, sale con el formato del reporte del contador: horas extra aprobadas por tipo, incapacidades, permisos, ausencias y tardanzas por persona. Después vienen el resumen, el detalle de extras y la asistencia diaria. Antes de enviarlo, revisa que no queden horas extra por aprobar.</p></div>';
     $('#nm-ok').onclick = async function () {
       var b = this; b.disabled = true; b.innerHTML = '<span class="spin"></span> Generando… (puede tardar un minuto)';
       try {

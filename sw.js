@@ -1,5 +1,5 @@
 /* sw.js — guarda la app en el celular para abrirla sin señal y envía la cola en segundo plano (Android). */
-var VERSION = 'ecosun-v1.0.1';
+var VERSION = 'ecosun-v1.0.2';
 var ARCHIVOS = [
   './', 'index.html', 'panel.html', 'manifest.webmanifest',
   'css/app.css', 'css/empleado.css', 'css/panel.css',
