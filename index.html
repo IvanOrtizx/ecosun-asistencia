@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>ECOSUN Asistencia</title>
+<meta name="description" content="Control de ingreso y salida del personal de ECOSUN Solutions">
+<meta name="theme-color" content="#F8A033">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="ECOSUN">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="img/icono-192.png">
+<link rel="apple-touch-icon" href="img/icono-180.png">
+<link rel="stylesheet" href="css/app.css">
+<link rel="stylesheet" href="css/empleado.css">
+</head>
+<body class="emp">
+<div class="halo" aria-hidden="true"></div>
+
+<!-- Cargando -->
+<section id="v-carga" class="acceso"><img class="logo" src="img/logo-ecosun.png" alt="ECOSUN Solutions"><p class="sub">Cargando…</p></section>
+
+<!-- Inicio de sesión -->
+<section id="v-login" class="acceso" hidden>
+  <img class="logo" src="img/logo-ecosun.png" alt="ECOSUN Solutions">
+  <p class="sub">Control de asistencia</p>
+  <form id="f-login" autocomplete="on" novalidate>
+    <div id="login-err" class="error" hidden></div>
+    <div class="campo"><label for="l-usuario">Cédula</label>
+      <input id="l-usuario" class="inp" inputmode="numeric" autocomplete="username" required placeholder="Sin puntos ni espacios"></div>
+    <div class="campo"><label for="l-pin">PIN</label>
+      <input id="l-pin" class="inp pin" type="password" inputmode="numeric" maxlength="6" autocomplete="current-password" required>
+      <span class="ayuda">La primera vez, tu PIN son los últimos 4 números de tu cédula.</span></div>
+    <button class="btn prim big" type="submit" id="b-login">Entrar</button>
+  </form>
+  <p class="small muted" style="text-align:center;margin-top:22px">Para entrar la primera vez necesitas conexión a internet.</p>
+</section>
+
+<!-- Cambio de PIN obligatorio -->
+<section id="v-pin" class="acceso" hidden>
+  <h1>Crea tu PIN</h1>
+  <p class="lead">Es personal. Lo vas a usar cada vez que abras la app.</p>
+  <form id="f-pin" novalidate>
+    <div id="pin-err" class="error" hidden></div>
+    <div class="campo"><label for="p-nuevo">PIN nuevo (4 a 6 números)</label><input id="p-nuevo" class="inp pin" type="password" inputmode="numeric" maxlength="6" autocomplete="new-password"></div>
+    <div class="campo"><label for="p-conf">Repite el PIN</label><input id="p-conf" class="inp pin" type="password" inputmode="numeric" maxlength="6" autocomplete="new-password"></div>
+    <button class="btn prim big" type="submit">Guardar PIN</button>
+  </form>
+</section>
+
+<!-- Autorización de datos -->
+<section id="v-consent" class="acceso" hidden>
+  <h1>Autorización de datos</h1>
+  <p class="lead">Léela antes de empezar a marcar.</p>
+  <div class="consent" id="consent-txt" tabindex="0"></div>
+  <label class="check"><input type="checkbox" id="c-acepto"> <span>Leí y autorizo el tratamiento de mis datos personales, incluida mi ubicación y mi fotografía al momento de marcar.</span></label>
+  <div id="consent-err" class="error" hidden></div>
+  <button class="btn prim big" id="b-consent" disabled>Aceptar y continuar</button>
+  <button class="enlace" id="b-no-acepto" style="margin-top:12px">No acepto</button>
+</section>
+
+<!-- Desbloqueo con PIN (funciona sin señal) -->
+<section id="v-bloqueo" class="acceso" hidden>
+  <img class="logo" src="img/logo-ecosun.png" alt="ECOSUN Solutions">
+  <p class="sub" id="bl-hola">Hola</p>
+  <form id="f-bloqueo" novalidate>
+    <div id="bl-err" class="error" hidden></div>
+    <div class="campo"><label for="bl-pin">Tu PIN</label><input id="bl-pin" class="inp pin" type="password" inputmode="numeric" maxlength="6" autocomplete="current-password"></div>
+    <button class="btn prim big" type="submit">Entrar</button>
+  </form>
+  <button class="enlace" id="b-otro" style="margin-top:18px;align-self:center">¿No eres tú? Cerrar sesión</button>
+</section>
+
+<!-- App -->
+<div id="v-app" class="app" hidden>
+  <header class="barra">
+    <img src="img/logo-ecosun.png" alt="ECOSUN Solutions">
+    <span class="esp"></span>
+    <span class="red on" id="red"><i></i><span>Con señal</span></span>
+    <button class="icono" id="b-menu" aria-label="Menú"></button>
+  </header>
+
+  <main class="cont" id="t-hoy">
+    <div class="saludo"><h1 id="hola">Hola</h1><p id="hoy-fecha"></p></div>
+    <div class="instalar" id="instalar" hidden></div>
+    <div class="card toca" id="toca"></div>
+    <div class="card reloj"><div><span class="t" id="clk">--:--</span><span class="ap" id="clk-ap"></span></div><div class="estado" id="estado"></div></div>
+    <div class="pend" id="pend" hidden></div>
+    <div class="acciones-dia" id="acciones"></div>
+    <div class="card lista"><h3>Mis marcas de hoy</h3><div id="hoy-lista"></div></div>
+  </main>
+
+  <main class="cont" id="t-semana" hidden>
+    <div class="saludo"><h1>Mi semana</h1><p id="sem-rango"></p></div>
+    <div class="totales" id="sem-tot"></div>
+    <div class="card"><div id="sem-dias"><p class="vacio">Cargando…</p></div></div>
+    <p class="small muted" id="sem-act"></p>
+  </main>
+
+  <nav class="tabs" aria-label="Secciones"><div class="in" role="tablist">
+    <button role="tab" aria-selected="true" data-tab="hoy"></button>
+    <button role="tab" aria-selected="false" data-tab="semana"></button>
+  </div></nav>
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/db.js"></script>
+<script src="js/reloj.js"></script>
+<script src="js/api.js"></script>
+<script src="js/cola.js"></script>
+<script src="js/util.js"></script>
+<script src="js/geo.js"></script>
+<script src="js/camara.js"></script>
+<script src="vendor/jsQR.js" defer></script>
+<script src="js/consentimiento.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

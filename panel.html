@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>ECOSUN Asistencia · Panel</title>
+<meta name="theme-color" content="#F8A033">
+<meta name="robots" content="noindex">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="img/icono-192.png">
+<link rel="apple-touch-icon" href="img/icono-180.png">
+<link rel="stylesheet" href="css/app.css">
+<link rel="stylesheet" href="css/panel.css">
+</head>
+<body class="pan">
+<section id="v-login" class="acceso" hidden>
+  <img class="logo" src="img/logo-ecosun.png" alt="ECOSUN Solutions">
+  <p class="sub">Panel de asistencia</p>
+  <form id="f-login" novalidate>
+    <div id="login-err" class="error" hidden></div>
+    <div class="campo"><label for="l-usuario">Celular o cédula</label><input id="l-usuario" class="inp" inputmode="numeric" autocomplete="username"></div>
+    <div class="campo"><label for="l-pin">PIN</label><input id="l-pin" class="inp pin" type="password" inputmode="numeric" maxlength="6" autocomplete="current-password">
+      <span class="ayuda">La primera vez: los últimos 4 números de tu celular (jefes) o de tu cédula.</span></div>
+    <button class="btn prim big" type="submit" id="b-login">Entrar</button>
+  </form>
+  <p class="small muted" style="text-align:center;margin-top:20px"><a href="index.html" class="enlace">Ir a la app para marcar</a></p>
+</section>
+
+<section id="v-pin" class="acceso" hidden>
+  <h1 style="margin:0 0 6px">Crea tu PIN</h1>
+  <p class="muted" style="margin:0 0 18px">Reemplaza el PIN temporal por uno personal.</p>
+  <form id="f-pin" novalidate>
+    <div id="pin-err" class="error" hidden></div>
+    <div class="campo"><label for="p-nuevo">PIN nuevo (4 a 6 números)</label><input id="p-nuevo" class="inp pin" type="password" inputmode="numeric" maxlength="6"></div>
+    <div class="campo"><label for="p-conf">Repite el PIN</label><input id="p-conf" class="inp pin" type="password" inputmode="numeric" maxlength="6"></div>
+    <button class="btn prim big" type="submit">Guardar PIN</button>
+  </form>
+</section>
+
+<div id="v-panel" hidden>
+  <header class="top"><div class="in">
+    <div class="fila"><img src="img/logo-ecosun.png" alt="ECOSUN Solutions"><div class="quien"><b id="quien"></b><button class="enlace small" id="b-salir" style="padding:0">Cerrar sesión</button></div></div>
+    <nav class="nav" id="nav" aria-label="Secciones"></nav>
+  </div></header>
+  <main class="pagina" id="pagina"></main>
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/db.js"></script>
+<script src="js/reloj.js"></script>
+<script src="js/api.js"></script>
+<script src="js/util.js"></script>
+<script src="vendor/qrcode.js"></script>
+<script src="js/panel.js"></script>
+</body>
+</html>

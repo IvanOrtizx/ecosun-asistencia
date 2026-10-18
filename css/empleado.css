@@ -1,0 +1,70 @@
+/* App del empleado — pensada para una mano, al sol, con guantes */
+body.emp{background:var(--bg)}
+.app{max-width:480px;margin:0 auto;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column}
+.barra{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding:calc(8px + env(safe-area-inset-top,0px)) 14px 8px;display:flex;align-items:center;gap:10px}
+.barra img{height:30px;width:auto}
+.barra .esp{flex:1}
+.red{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;border-radius:999px;padding:5px 10px}
+.red.on{background:var(--ok-bg);color:var(--ok)}.red.off{background:var(--warn-bg);color:var(--warn)}
+.red i{width:8px;height:8px;border-radius:50%;background:currentColor}
+.icono{width:44px;height:44px;border-radius:12px;border:0;background:transparent;display:grid;place-items:center}
+.icono:active{background:var(--soft)}
+main.cont{flex:1;padding:16px 16px calc(96px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:14px}
+
+/* Pantallas de acceso */
+.acceso{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;justify-content:center;padding:28px 22px calc(28px + env(safe-area-inset-bottom,0px));max-width:420px;margin:0 auto}
+.acceso .logo{width:220px;margin:0 auto 6px;display:block}
+.acceso .sub{text-align:center;color:var(--muted);font-weight:600;margin:0 0 28px;letter-spacing:.02em}
+.acceso h1{font-size:24px;margin:0 0 6px;font-weight:800;letter-spacing:-.015em}
+.acceso p.lead{margin:0 0 20px;color:var(--muted)}
+.halo{position:fixed;inset:auto -30vw -30vw auto;width:80vw;height:80vw;border-radius:50%;background:radial-gradient(circle,rgba(253,200,48,.22),rgba(243,115,53,.08) 55%,transparent 70%);pointer-events:none;z-index:-1}
+.consent{max-height:46vh;overflow:auto;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;font-size:14.5px;line-height:1.55}
+.consent h4{margin:12px 0 4px;font-size:14.5px}
+.check{display:flex;gap:12px;align-items:flex-start;margin:16px 0;font-size:15px;font-weight:500}
+.check input{width:24px;height:24px;flex:none;margin-top:1px;accent-color:var(--naranja)}
+
+/* Inicio */
+.saludo h1{margin:0;font-size:24px;font-weight:800;letter-spacing:-.015em}
+.saludo p{margin:2px 0 0;color:var(--muted);font-weight:500}
+.toca{display:flex;gap:12px;align-items:flex-start}
+.toca .pin{width:42px;height:42px;border-radius:12px;background:var(--grad);display:grid;place-items:center;flex:none;color:#1F1B16}
+.toca b{display:block;font-size:17px}
+.toca span{color:var(--muted);font-size:14px;display:block}
+.reloj{text-align:center;padding:4px 0}
+.reloj .t{font-size:64px;font-weight:800;line-height:1;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.reloj .ap{font-size:20px;font-weight:700;color:var(--muted);margin-left:4px;letter-spacing:0}
+.reloj .estado{margin-top:10px;font-weight:600;font-size:15px}
+.acciones-dia{display:flex;flex-direction:column;gap:10px}
+.btn.big.sal{background:var(--ink);color:#fff;border:0}
+.pend{display:flex;align-items:center;gap:12px;background:var(--warn-bg);color:var(--warn);border-radius:14px;padding:13px 14px;font-weight:600;font-size:14.5px}
+.pend .btn{margin-left:auto;flex:none}
+.lista .r{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 0;border-top:1px solid var(--line)}
+.lista .r:first-of-type{border-top:0;padding-top:2px}
+.lista .r b{display:block;font-size:15.5px}
+.lista .r span{font-size:13.5px;color:var(--muted)}
+.lista .tags{display:flex;flex-direction:column;gap:4px;align-items:flex-end}
+.vacio{color:var(--muted);margin:0;font-size:14.5px}
+
+/* Pestañas inferiores */
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;background:#fff;border-top:1px solid var(--line);display:flex;justify-content:center;padding-bottom:env(safe-area-inset-bottom,0px)}
+.tabs .in{display:flex;max-width:480px;width:100%}
+.tabs button{flex:1;border:0;background:none;min-height:62px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:12.5px;font-weight:700;color:var(--muted)}
+.tabs button[aria-selected="true"]{color:var(--ink)}
+.tabs button[aria-selected="true"] svg{color:var(--naranja)}
+
+/* Semana */
+.totales{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.tot{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px;text-align:center}
+.tot b{display:block;font-size:22px;font-weight:800;font-variant-numeric:tabular-nums}
+.tot span{font-size:12.5px;color:var(--muted);font-weight:600}
+.dia{display:grid;grid-template-columns:62px 1fr auto;gap:10px;align-items:center;padding:12px 0;border-top:1px solid var(--line)}
+.dia:first-of-type{border-top:0}
+.dia .f{font-weight:700;text-transform:capitalize;line-height:1.2}
+.dia .f small{display:block;color:var(--muted);font-weight:500;font-size:12.5px}
+.dia .h{font-size:14px;color:var(--muted)}
+.dia .h b{color:var(--ink);font-size:15px}
+.dia .x{text-align:right;display:flex;flex-direction:column;gap:4px;align-items:flex-end}
+.instalar{display:flex;gap:12px;align-items:center;background:var(--surface);border:1.5px dashed var(--naranja);border-radius:14px;padding:12px 14px;font-size:14.5px}
+.instalar b{display:block}
+.menu-op{display:flex;flex-direction:column;gap:10px}
+.menu-op .btn{justify-content:flex-start}
