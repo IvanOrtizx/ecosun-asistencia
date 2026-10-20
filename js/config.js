@@ -1,7 +1,7 @@
 /* Configuración de la app. API_URL = URL /exec de la implementación de Apps Script en la cuenta de ECOSUN. */
 self.CFG = {
-  API_URL: 'PEGAR_AQUI_URL_DE_APPS_SCRIPT',
-  VERSION: '1.0.0',
+  API_URL: 'https://script.google.com/macros/s/AKfycbyMt-ry3GTt5I_M9JRLTd279b5BdQ_WdUBwObXuPcjNOa-d1dOrw1gDQzL-SeETf_2ukg/exec',
+  VERSION: '1.0.4',
   EMPRESA: 'ECOSUN Solutions'
 };
 // Solo para pruebas en el computador (localhost): ?api=/api cambia el servidor. En producción no se permite,

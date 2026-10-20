@@ -65,6 +65,6 @@ main.cont{flex:1;padding:16px 16px calc(96px + env(safe-area-inset-bottom,0px));
 .dia .h b{color:var(--ink);font-size:15px}
 .dia .x{text-align:right;display:flex;flex-direction:column;gap:4px;align-items:flex-end}
 .instalar{display:flex;gap:12px;align-items:center;background:var(--surface);border:1.5px dashed var(--naranja);border-radius:14px;padding:12px 14px;font-size:14.5px}
-.instalar b{display:block}
+.instalar>div>b{display:block}
 .menu-op{display:flex;flex-direction:column;gap:10px}
 .menu-op .btn{justify-content:flex-start}
