@@ -83,6 +83,25 @@
     } catch (ex) { fallo(ex); }
   }
 
+
+  /* Buscador: filtra filas con data-buscar; oculta títulos de grupo sin resultados */
+  function norm(t) { return String(t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase(); }
+  function buscadorHtml(ph) { return '<label class="buscar"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><span class="sr">Buscar</span><input type="search" id="buscar" placeholder="' + ph + '" autocomplete="off" value="' + esc(S.busqueda || '') + '"></label>'; }
+  function activarBuscador() {
+    var inp = $('#buscar'); if (!inp) return;
+    var aplicar = function () {
+      S.busqueda = inp.value;
+      var q = norm(inp.value).trim().split(/\s+/).filter(Boolean), n = 0;
+      $$('[data-buscar]').forEach(function (tr) {
+        var t = tr.getAttribute('data-buscar'), ok = q.every(function (w) { return t.indexOf(w) >= 0; });
+        tr.hidden = !ok; if (ok) n++;
+      });
+      $$('[data-grupo-tit]').forEach(function (th) { th.hidden = !$$('[data-g="' + th.getAttribute('data-grupo-tit') + '"]').some(function (r) { return !r.hidden; }); });
+      var v = $('#sin-res'); if (v) v.hidden = n > 0;
+    };
+    inp.addEventListener('input', aplicar);
+    aplicar();
+  }
   /* ---------------- HOY ---------------- */
   var VISTA = {};
   VISTA.hoy = async function () {
@@ -193,8 +212,8 @@
     S.semDesde = r.desde;
     var grupos = {}; r.filas.forEach(function (f) { (grupos[f.grupo || 'Otros'] = grupos[f.grupo || 'Otros'] || []).push(f); });
     var filas = Object.keys(grupos).map(function (g) {
-      return '<tr><th colspan="' + (r.fechas.length + 2) + '" style="padding-top:16px;color:var(--ink)">' + esc(g) + '</th></tr>' + grupos[g].map(function (f) {
-        return '<tr><td class="n"><b>' + esc(f.nombre) + '</b><span>' + esc(f.cargo) + '</span></td>' + f.dias.map(function (d, i) {
+      return '<tr data-grupo-tit="' + esc(g) + '"><th colspan="' + (r.fechas.length + 2) + '" style="padding-top:16px;color:var(--ink)">' + esc(g) + '</th></tr>' + grupos[g].map(function (f) {
+        return '<tr data-g="' + esc(g) + '" data-buscar="' + esc(norm(f.nombre + ' ' + f.cargo)) + '"><td class="n"><b>' + esc(f.nombre) + '</b><span>' + esc(f.cargo) + '</span></td>' + f.dias.map(function (d, i) {
           var cls = 'c' + (r.fechas[i] === r.hoy ? ' hoy' : '');
           if (!d.primera) {
             var t = d.estado === 'ausente' ? '<span class="tag t-bad">Sin marcas</span>' : d.estado === 'justificado' ? '<span class="tag t-info">' + esc(d.justificado) + '</span>' : d.estado === 'por_llegar' ? '<span class="tag t-mute">Por llegar</span>' : '<span class="muted small">' + (d.laboral ? '' : '—') + '</span>';
@@ -211,9 +230,10 @@
       }).join('');
     }).join('');
     P().innerHTML = '<div class="cab"><div><h1>Semana</h1><p>Del ' + esc(fechaLarga(r.desde)) + ' al ' + esc(fechaLarga(r.hasta)) + '</p></div><div class="herr">' +
-      '<button class="btn chico" data-sem="' + sumDias(r.desde, -7) + '">← Anterior</button><button class="btn chico" data-sem="' + hoy() + '">Esta semana</button><button class="btn chico" data-sem="' + sumDias(r.desde, 7) + '">Siguiente →</button></div></div>' +
+      buscadorHtml('Buscar persona') + '<button class="btn chico" data-sem="' + sumDias(r.desde, -7) + '">← Anterior</button><button class="btn chico" data-sem="' + hoy() + '">Esta semana</button><button class="btn chico" data-sem="' + sumDias(r.desde, 7) + '">Siguiente →</button></div></div>' +
       '<div class="card"><div class="tbl"><table class="semana"><thead><tr><th>Persona</th>' + r.fechas.map(function (f) { return '<th class="' + (f === r.hoy ? 'hoy' : '') + '">' + fechaCorta(f) + '</th>'; }).join('') + '<th class="num">Total</th></tr></thead><tbody>' + filas + '</tbody></table></div>' +
       '<p class="small muted" style="margin:12px 0 0">Toca una casilla para ver las marcas del día o registrar una novedad (salida olvidada, permiso, incapacidad).</p></div>';
+    activarBuscador();
   };
 
   /* ---------------- EXTRAS ---------------- */
@@ -269,11 +289,13 @@
   VISTA.personal = async function () {
     var b = await cargarBase(true);
     var tipos = { oficina: 'Oficina', obra: 'Obra', ambos: 'Oficina y obra', ninguno: 'No marca' };
-    P().innerHTML = '<div class="cab"><div><h1>Personal</h1><p>' + b.empleados.filter(function (e) { return e.activo && e.tipo !== 'ninguno'; }).length + ' personas activas que marcan.</p></div><div class="herr"><button class="btn prim chico" id="emp-nuevo">+ Nueva persona</button></div></div>' +
+    P().innerHTML = '<div class="cab"><div><h1>Personal</h1><p>' + b.empleados.filter(function (e) { return e.activo && e.tipo !== 'ninguno'; }).length + ' personas activas que marcan.</p></div><div class="herr">' + buscadorHtml('Buscar por nombre, cédula o cargo') + '<button class="btn prim chico" id="emp-nuevo">+ Nueva persona</button></div></div>' +
       '<div class="card"><div class="tbl"><table><thead><tr><th>Persona</th><th>Cédula</th><th>Marca en</th><th>Lugar base</th><th>Horario</th><th>Acceso</th><th>Celular</th><th>Autorización</th></tr></thead><tbody>' +
       b.empleados.slice().sort(function (x, y) { return (y.activo - x.activo) || x.nombre.localeCompare(y.nombre); }).map(function (e) {
-        return '<tr class="clic" data-emp="' + e.id + '"' + (e.activo ? '' : ' style="opacity:.5"') + '><td class="n"><b>' + esc(e.nombre) + '</b><span>' + esc(e.cargo) + (e.rol !== 'empleado' ? ' · ' + esc(e.rol) : '') + (e.piloto ? ' · piloto' : '') + '</span></td><td class="num">' + esc(e.cedula || e.telefono) + '</td><td>' + esc(tipos[e.tipo] || e.tipo) + '</td><td>' + esc(e.sede_base ? sedeNombre(e.sede_base) : '—') + '</td><td>' + esc(e.horario_id || '—') + '</td><td>' + (e.pin_temporal ? '<span class="tag t-warn">PIN temporal</span>' : '<span class="tag t-ok">Activo</span>') + '</td><td>' + (e.tiene_dispositivo ? '<span class="tag t-ok">Registrado</span>' : '<span class="tag t-mute">Aún no</span>') + '</td><td>' + (e.tipo === 'ninguno' ? '—' : e.consentimiento ? '<span class="tag t-ok">' + esc(e.consentimiento) + '</span>' : '<span class="tag t-mute">Pendiente</span>') + '</td></tr>';
+        return '<tr class="clic" data-emp="' + e.id + '" data-buscar="' + esc(norm([e.nombre, e.cedula, e.telefono, e.cargo, e.grupo, e.sede_base ? sedeNombre(e.sede_base) : ''].join(' '))) + '"' + (e.activo ? '' : ' style="opacity:.5"') + '><td class="n"><b>' + esc(e.nombre) + '</b><span>' + esc(e.cargo) + (e.rol !== 'empleado' ? ' · ' + esc(e.rol) : '') + (e.piloto ? ' · piloto' : '') + '</span></td><td class="num">' + esc(e.cedula || e.telefono) + '</td><td>' + esc(tipos[e.tipo] || e.tipo) + '</td><td>' + esc(e.sede_base ? sedeNombre(e.sede_base) : '—') + '</td><td>' + esc(e.horario_id || '—') + '</td><td>' + (e.pin_temporal ? '<span class="tag t-warn">PIN temporal</span>' : '<span class="tag t-ok">Activo</span>') + '</td><td>' + (e.tiene_dispositivo ? '<span class="tag t-ok">Registrado</span>' : '<span class="tag t-mute">Aún no</span>') + '</td><td>' + (e.tipo === 'ninguno' ? '—' : e.consentimiento ? '<span class="tag t-ok">' + esc(e.consentimiento) + '</span>' : '<span class="tag t-mute">Pendiente</span>') + '</td></tr>';
       }).join('') + '</tbody></table></div></div>';
+    P().querySelector('.card').insertAdjacentHTML('beforeend', '<p class="vacio" id="sin-res" hidden>Nadie coincide con la búsqueda.</p>');
+    activarBuscador();
     $('#emp-nuevo').onclick = function () { editarEmpleado(null); };
   };
   function editarEmpleado(id) {
@@ -375,10 +397,10 @@
     S.cambios = {};
     P().innerHTML = '<div class="cab"><div><h1>Programación</h1><p>Dónde trabaja cada persona los próximos 14 días. Si no se cambia, va a su lugar base.</p></div><div class="herr filtros">' +
       '<select class="inp" id="pg-grupo"><option value="">Todos los grupos</option>' + grupos.map(function (g) { return '<option' + (g === grupo ? ' selected' : '') + '>' + esc(g) + '</option>'; }).join('') + '</select>' +
-      '<button class="btn chico" id="pg-masivo">Asignar varios días</button></div></div>' +
+      buscadorHtml('Buscar persona') + '<button class="btn chico" id="pg-masivo">Asignar varios días</button></div></div>' +
       '<div class="card"><div class="tbl"><table class="prog"><thead><tr><th>Persona</th>' + dias.map(function (f) { var w = dowDe(f); return '<th class="' + (w === 0 || w === 6 ? 'fin' : '') + '">' + fechaCorta(f) + '</th>'; }).join('') + '</tr></thead><tbody>' +
       emps.map(function (e) {
-        return '<tr><td class="n"><b>' + esc(e.nombre) + '</b><span>' + esc(e.cargo) + '</span></td>' + dias.map(function (f) {
+        return '<tr data-buscar="' + esc(norm(e.nombre + ' ' + e.cargo + ' ' + (e.grupo || ''))) + '"><td class="n"><b>' + esc(e.nombre) + '</b><span>' + esc(e.cargo) + '</span></td>' + dias.map(function (f) {
           var v = b.programacion[e.id + '|' + f] || '', w = dowDe(f);
           return '<td class="' + (w === 0 || w === 6 ? 'fin' : '') + '"><select aria-label="' + esc(e.nombre + ' ' + f) + '" data-pg="' + e.id + '|' + f + '" data-orig="' + esc(v) + '">' + sedes.map(function (s) { return '<option value="' + s.id + '"' + (s.id === v ? ' selected' : '') + '>' + esc(corto(s.nombre)) + '</option>'; }).join('') + '</select></td>';
         }).join('') + '</tr>';
@@ -398,6 +420,7 @@
       try { var r = await api('guardar_programacion', { cambios: cambios }); toast(r.guardadas + ' cambios guardados', 'ok'); S.base = null; ir('programacion'); } catch (ex) { toast(ex.message, 'bad'); }
     };
     $('#pg-masivo').onclick = function () { programarVarios(emps, sedes, b.hoy); };
+    activarBuscador();
   };
   function programarVarios(emps, sedes, h0) {
     var h = abrirHoja('<h2>Asignar varios días</h2><div class="error" id="pm-err" hidden></div>' +
