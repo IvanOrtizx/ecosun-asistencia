@@ -78,7 +78,7 @@ select.inp{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns
 .paso{display:flex;gap:12px;align-items:flex-start;padding:13px 0;border-top:1px solid var(--line)}
 .paso:first-of-type{border-top:0;padding-top:4px}
 .paso>div:not(.ic){min-width:0;flex:1}
-.paso b{display:block;font-size:15.5px}
+.paso>div>b{display:block;font-size:15.5px}
 .paso span.d{font-size:14px;color:var(--muted)}
 .ic{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;flex:none;background:var(--soft);color:var(--muted)}
 .ic.ok{background:var(--ok-bg);color:var(--ok)}.ic.bad{background:var(--bad-bg);color:var(--bad)}.ic.wait{background:var(--info-bg);color:var(--info)}.ic.warn{background:var(--warn-bg);color:var(--warn)}

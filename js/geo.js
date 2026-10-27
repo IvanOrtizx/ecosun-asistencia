@@ -10,7 +10,7 @@ self.Geo = (function () {
       function terminar() {
         if (fin) return; fin = true;
         navigator.geolocation.clearWatch(id); clearTimeout(t);
-        if (mejor) ok(mejor); else mal(new Error('No se pudo obtener la ubicación. Revisa que el GPS esté encendido y sal a cielo abierto.'));
+        if (mejor) ok(mejor); else { var er = new Error('No se pudo obtener la ubicación. Revisa que la ubicación esté encendida y sal a cielo abierto.'); er.apagado = true; mal(er); }
       }
       var t = setTimeout(terminar, limite);
       id = navigator.geolocation.watchPosition(function (p) {
@@ -19,7 +19,7 @@ self.Geo = (function () {
         if (progreso) progreso(mejor);
         if (mejor.precision <= objetivo) terminar();
       }, function (e) {
-        if (e.code === 1) { fin = true; clearTimeout(t); navigator.geolocation.clearWatch(id); mal(new Error('Diste "no permitir" a la ubicación. Actívala en los permisos del navegador para esta página.')); }
+        if (e.code === 1) { fin = true; clearTimeout(t); navigator.geolocation.clearWatch(id); var er = new Error('El celular no le da permiso de ubicación a la app.'); er.permiso = true; mal(er); }
       }, { enableHighAccuracy: true, maximumAge: 0, timeout: limite });
     });
   }

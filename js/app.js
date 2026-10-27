@@ -275,7 +275,7 @@
     var F = { tipo: tipo, pos: null, ub: null, qr: null, selfie: null, t: null, te: null, metodo: null };
     var hoja = abrirHoja(
       '<h2>' + esc(etiqueta) + '</h2>' +
-      '<div class="paso" id="p-gps"><div class="ic wait"><span class="spin"></span></div><div><b>Buscando tu ubicación…</b><span class="d" id="gps-d">El GPS funciona aunque no tengas datos.</span></div></div>' +
+      '<div class="paso" id="p-gps"><div class="ic wait"><span class="spin"></span></div><div><b>Buscando tu ubicación…</b><span class="d" id="gps-d">El GPS funciona aunque no tengas datos.</span><div id="gps-ayuda"></div></div></div>' +
       '<div class="paso" id="p-ver"><div class="ic">' + ICON.cam + '</div><div><b id="ver-t">Verificación</b><span class="d" id="ver-d">Espera la ubicación.</span><div id="ver-x"></div></div></div>' +
       '<div class="paso" id="p-env"><div class="ic">' + (navigator.onLine ? ICON.nube : ICON.sinred) + '</div><div><b>' + (navigator.onLine ? 'Se envía de inmediato' : 'Se guarda en el celular') + '</b><span class="d">' + (navigator.onLine ? 'Queda registrada en el panel de la empresa.' : 'Sin datos no pasa nada: se envía con la hora de ahora cuando vuelva la señal.') + '</span></div></div>' +
       '<div id="f-aviso"></div>' +
@@ -298,7 +298,10 @@
       if (!$('#hoja')) return;
       F.ub = { sede: prog, dist: null, dentro: false };
       pasoGps(false, 'Sin ubicación', ex.message, 'warn');
-      $('#f-aviso', hoja).innerHTML = '<p class="aviso" style="margin:12px 0 0">' + ICON.alerta + '<span>Si marcas sin GPS, la empresa verá el aviso "Sin GPS".</span></p>';
+      $('#gps-ayuda', hoja).innerHTML = '<div class="nota" style="margin:10px 0 0"><b>Cómo activarla:</b><ol style="margin:6px 0 0;padding-left:20px">' + pasosUbicacion(ex) + '</ol>' +
+        '<button class="btn prim bloque" id="b-reintentar-gps" style="margin-top:10px">Ya la activé, intentar de nuevo</button></div>';
+      $('#f-aviso', hoja).innerHTML = '<p class="aviso" style="margin:10px 0 0">' + ICON.alerta + '<span>Si marcas sin ubicación, la empresa verá el aviso "Sin GPS".</span></p>';
+      $('#b-reintentar-gps', hoja).onclick = function () { cerrarHoja(); marcar(tipo, etiqueta); };
     }
     var sede = F.ub.sede, oficina = sede && sede.tipo === 'oficina';
     var vx = $('#ver-x', hoja), vi = $('#p-ver .ic', hoja);
@@ -364,6 +367,19 @@
       await render();
       sincronizar(true);
     };
+  }
+
+  /** Pasos para activar la ubicación según el celular y si está instalada */
+  function pasosUbicacion(ex) {
+    var inst = matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+    if (ES_IOS) return '<li><b>Ajustes > Privacidad y seguridad > Localización</b>: actívala.</li>' +
+      '<li>En esa misma lista, entra a <b>' + (inst ? 'ECOSUN' : 'Safari') + '</b> (o "Sitios web de Safari") y elige <b>Al usar la app</b>.</li>' +
+      (inst ? '' : '<li>En Safari, toca <b>aA</b> en la barra de dirección > <b>Configuración del sitio web</b> > <b>Ubicación</b> > <b>Permitir</b>.</li>') +
+      '<li>Vuelve aquí y toca el botón de abajo.</li>';
+    return '<li>Baja la cortina de arriba del celular y enciende la <b>Ubicación</b>.</li>' +
+      (inst ? '<li>Mantén presionado el ícono de ECOSUN > <b>Información de la app</b> > <b>Permisos</b> > <b>Ubicación</b> > <b>Permitir mientras se usa la app</b>.</li>'
+        : '<li>En Chrome, toca el ícono a la izquierda de la dirección (candado) > <b>Permisos</b> > <b>Ubicación</b> > <b>Permitir</b>.</li>') +
+      '<li>Vuelve aquí y toca el botón de abajo.</li>';
   }
 
   /* ---------------- Semana ---------------- */
