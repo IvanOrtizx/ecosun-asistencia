@@ -147,8 +147,23 @@
   }
   async function refrescarSesion() {
     if (!navigator.onLine) return;
-    try { var r = await API.post('sesion', {}); await guardarSesion(r); S.sinRed = false; render(); }
+    try { var r = await API.post('sesion', {}); await guardarSesion(r); S.sinRed = false; await traerMarcasHoy(); render(); }
     catch (ex) { if (ex.codigo === 'sesion') { S.sesionVencida = true; render(); } else if (ex.red) { S.sinRed = true; pintarRed(); } }
+  }
+  /** Trae del servidor las marcas de hoy (por si se marcó desde otro celular, desde Safari o se borraron los datos) */
+  async function traerMarcasHoy() {
+    try {
+      var hoy = hoyL().fecha;
+      var r = await API.post('mi_historial', { desde: hoy, hasta: hoy });
+      var locales = {}; (await DB.todos('marcas')).forEach(function (m) { locales[m.id] = true; });
+      for (var i = 0; i < r.marcas.length; i++) {
+        var m = r.marcas[i];
+        if (locales[m.id]) continue;
+        var p = m.fecha.split('-'), h = hm2min(m.hora);
+        m.t_dispositivo = Date.UTC(+p[0], +p[1] - 1, +p[2]) + h * 60000 + 5 * 3600000;
+        await DB.poner('marcas', m);
+      }
+    } catch (e) { }
   }
   async function limpiarViejas() {
     var lim = Date.now() - 40 * 86400000;
