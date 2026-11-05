@@ -12,6 +12,19 @@
   function err(sel, msg) { var e = $(sel); e.textContent = msg || ''; e.hidden = !msg; }
 
   /* ---------------- Arranque ---------------- */
+  // Si a los 10 s sigue en "Cargando…", se ofrecen opciones para salir del bloqueo
+  var ayudaCarga = setTimeout(function () { if (!$('#v-carga').hidden) $('#carga-ayuda').hidden = false; }, 10000);
+  $('#b-recargar').onclick = function () { location.reload(); };
+  $('#b-reparar').onclick = async function () {
+    this.disabled = true; this.textContent = 'Reparando…';
+    try { if ('serviceWorker' in navigator) { var rs = await navigator.serviceWorker.getRegistrations(); await Promise.all(rs.map(function (r) { return r.unregister(); })); } } catch (e) { }
+    try { if (self.caches) { var ks = await caches.keys(); await Promise.all(ks.map(function (k) { return caches.delete(k); })); } } catch (e) { }
+    location.replace(location.pathname + '?r=' + Date.now());
+  };
+  async function iniciarSeguro() {
+    try { await iniciar(); }
+    catch (e) { $('#carga-txt').textContent = 'No se pudo abrir la app (' + (e && e.message || 'error') + ').'; $('#carga-ayuda').hidden = false; }
+  }
   async function iniciar() {
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('sw.js').catch(function () { });
@@ -26,7 +39,8 @@
     if (!S.disp) { S.disp = uuid(); await DB.set('dispositivo_id', S.disp); }
     S.sesion = await DB.get('sesion');
     if (navigator.onLine) API.post('hora', {}, { token: null, timeout: 8000 }).catch(function () { });
-    siguientePaso();
+    clearTimeout(ayudaCarga);
+    await siguientePaso();
   }
 
   async function siguientePaso() {
@@ -137,6 +151,7 @@
   var timer = null, sincTimer = null;
   function entrarApp() {
     mostrar('app');
+    if (DB.memoria && !S.avisoMemoria) { S.avisoMemoria = true; abrirHoja('<h2>Ojo con este celular</h2><p>El navegador no está dejando guardar los datos de la app (puede ser poco espacio libre, modo incógnito o una falla del navegador). La app funciona, pero <b>si marcas sin señal la marca podría perderse</b>.</p><p class="small muted">Libera espacio, no uses modo incógnito y reinicia el celular. Si sigue igual, avísale a tu jefe.</p><div class="acciones"><button class="btn prim" data-cerrar>Entendido</button></div>'); }
     $('#hola').textContent = 'Hola, ' + primerNombre(S.sesion.perfil.nombre);
     render();
     if (!timer) timer = setInterval(tic, 1000);
@@ -475,5 +490,5 @@
     if (b.id === 'b-no-inst') { S.ocultarInstalar = true; return pintarInstalar(); }
   });
 
-  iniciar();
+  iniciarSeguro();
 })();
