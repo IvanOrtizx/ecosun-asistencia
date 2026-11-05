@@ -38,6 +38,8 @@
     S.disp = await DB.get('dispositivo_id');
     if (!S.disp) { S.disp = uuid(); await DB.set('dispositivo_id', S.disp); }
     S.sesion = await DB.get('sesion');
+    // Sesión incompleta o dañada: se descarta y se pide entrar de nuevo (las marcas pendientes se conservan)
+    if (S.sesion && (!S.sesion.token || !S.sesion.perfil || !S.sesion.perfil.nombre)) { S.sesion = null; try { await DB.del('sesion'); await DB.del('desbloqueo'); } catch (e) { } }
     if (navigator.onLine) API.post('hora', {}, { token: null, timeout: 8000 }).catch(function () { });
     clearTimeout(ayudaCarga);
     await siguientePaso();
@@ -55,6 +57,7 @@
   }
 
   async function guardarSesion(res, pin) {
+    if (!res || !res.token || !res.perfil) throw new Error('Respuesta incompleta del servidor. Intenta de nuevo.');
     var s = Object.assign({}, res); delete s.ok; delete s.ahora;
     S.sesion = s;
     await DB.set('sesion', s);
