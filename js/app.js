@@ -19,6 +19,11 @@
     this.disabled = true; this.textContent = 'Reparando…';
     try { if ('serviceWorker' in navigator) { var rs = await navigator.serviceWorker.getRegistrations(); await Promise.all(rs.map(function (r) { return r.unregister(); })); } } catch (e) { }
     try { if (self.caches) { var ks = await caches.keys(); await Promise.all(ks.map(function (k) { return caches.delete(k); })); } } catch (e) { }
+    // Renueva también la copia que Chrome guarda de cada archivo (hasta 10 min)
+    try { await Promise.all(['index.html', 'js/config.js', 'js/db.js', 'js/reloj.js', 'js/api.js', 'js/cola.js', 'js/util.js', 'js/geo.js', 'js/camara.js', 'js/consentimiento.js', 'js/app.js', 'css/app.css', 'css/empleado.css', 'sw.js']
+      .map(function (f) { return fetch(f, { cache: 'reload' }).catch(function () { }); })); } catch (e) { }
+    // Sesión dañada: se descarta (las marcas pendientes no se tocan)
+    try { var ses = await DB.get('sesion'); if (ses && (!ses.token || !ses.perfil)) await DB.del('sesion'); } catch (e) { }
     location.replace(location.pathname + '?r=' + Date.now());
   };
   async function iniciarSeguro() {
